@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MSB Steganography Tool</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>MSB Steganography Tool</h1>
+
+  <input type="file" id="imageInput" accept="image/*"><br>
+  <input type="text" id="charInput" maxlength="1" placeholder="Enter 1 character"><br>
+
+  <button onclick="encrypt()">Encrypt</button>
+  <button onclick="decrypt()">Decrypt</button>
+  <button onclick="downloadStego()">Download Stego Image</button>
+  <button onclick="resetAll()">Reset</button><br>
+
+  <h2>Original Image</h2>
+  <canvas id="originalCanvas" width="128" height="128"></canvas>
+
+  <h2>Result Image</h2>
+  <canvas id="resultCanvas" width="128" height="128"></canvas>
+
+  <div id="outputChar"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

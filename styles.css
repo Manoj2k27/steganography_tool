@@ -1,0 +1,49 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1, h2 {
+  color: #333;
+  text-align: center;
+  margin-top: 20px;
+}
+
+input, button {
+  margin: 8px;
+  padding: 10px;
+  font-size: 16px;
+  width: 90%;
+  max-width: 300px;
+  box-sizing: border-box;
+}
+
+canvas {
+  margin: 10px auto;
+  border: 1px solid #aaa;
+  max-width: 95vw;
+  height: auto;
+  width: 128px;
+}
+
+#outputChar {
+  margin-top: 20px;
+  font-size: 20px;
+  color: green;
+  text-align: center;
+}
+
+@media screen and (max-width: 480px) {
+  input, button {
+    font-size: 14px;
+    width: 95%;
+  }
+  canvas {
+    width: 90vw;
+  }
+}
