@@ -2,9 +2,14 @@ const originalCanvas = document.getElementById('originalCanvas');
 const resultCanvas = document.getElementById('resultCanvas');
 const originalCtx = originalCanvas.getContext('2d');
 const resultCtx = resultCanvas.getContext('2d');
+const outputChar = document.getElementById('outputChar');
+
 let imageLoaded = false;
 
-document.getElementById('imageInput').addEventListener('change', function (e) {
+document.getElementById('uploadImage').addEventListener('change', function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
   const reader = new FileReader();
   reader.onload = function (event) {
     const img = new Image();
@@ -14,81 +19,64 @@ document.getElementById('imageInput').addEventListener('change', function (e) {
     };
     img.src = event.target.result;
   };
-  reader.readAsDataURL(e.target.files[0]);
+  reader.readAsDataURL(file);
 });
-
-function setMSB(value, bit) {
-  value = value & 0x7F;
-  if (bit === '1') value = value | 0x80;
-  return value;
-}
-
-function getMSB(value) {
-  return (value & 0x80) ? '1' : '0';
-}
 
 function encrypt() {
   if (!imageLoaded) {
-    alert("Please upload an image first.");
+    alert('Please upload an image first!');
     return;
   }
 
   const char = document.getElementById('charInput').value;
   if (char.length !== 1) {
-    alert("Enter exactly 1 character.");
+    alert('Please enter exactly one character.');
     return;
   }
 
-  const binary = char.charCodeAt(0).toString(2).padStart(8, '0');
+  const charCode = char.charCodeAt(0); // 8 bits
   const imageData = originalCtx.getImageData(0, 0, 128, 128);
   const data = imageData.data;
 
   for (let i = 0; i < 8; i++) {
-    const pixelIndex = i * 4;
-    const original = data[pixelIndex];
-    data[pixelIndex] = setMSB(original, binary[i]);
+    const bit = (charCode >> (7 - i)) & 1;
+    if (bit === 0) {
+      data[i * 4] = data[i * 4] & 0b01111111; // clear MSB
+    } else {
+      data[i * 4] = data[i * 4] | 0b10000000; // set MSB
+    }
   }
 
   resultCtx.putImageData(imageData, 0, 0);
-  alert("Character embedded!");
+  outputChar.textContent = 'Character embedded successfully!';
 }
 
 function decrypt() {
-  if (!imageLoaded) {
-    alert("Please upload an image first.");
-    return;
-  }
-
   const imageData = resultCtx.getImageData(0, 0, 128, 128);
   const data = imageData.data;
-  let bits = "";
+  let charCode = 0;
 
   for (let i = 0; i < 8; i++) {
-    const pixelIndex = i * 4;
-    bits += getMSB(data[pixelIndex]);
+    const msb = (data[i * 4] >> 7) & 1;
+    charCode |= (msb << (7 - i));
   }
 
-  const charCode = parseInt(bits, 2);
-  const character = String.fromCharCode(charCode);
-  if (character && !isNaN(charCode)) {
-    document.getElementById('outputChar').innerText = `Extracted Character: '${character}'`;
-  } else {
-    document.getElementById('outputChar').innerText = `No character found.`;
-  }
+  const char = String.fromCharCode(charCode);
+  outputChar.textContent = `Decrypted Character: ${char}`;
 }
 
-function downloadStego() {
+function downloadImage() {
   const link = document.createElement('a');
-  link.download = 'stego-image.png';
+  link.download = 'encrypted_image.png';
   link.href = resultCanvas.toDataURL();
   link.click();
 }
 
-function resetAll() {
-  originalCtx.clearRect(0, 0, 128, 128);
-  resultCtx.clearRect(0, 0, 128, 128);
-  document.getElementById('imageInput').value = '';
+function resetCanvas() {
+  originalCtx.clearRect(0, 0, originalCanvas.width, originalCanvas.height);
+  resultCtx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+  outputChar.textContent = '';
   document.getElementById('charInput').value = '';
-  document.getElementById('outputChar').innerText = '';
+  document.getElementById('uploadImage').value = '';
   imageLoaded = false;
 }
