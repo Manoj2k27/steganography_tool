@@ -10,7 +10,6 @@ document.getElementById('imageInput').addEventListener('change', function (e) {
     const img = new Image();
     img.onload = function () {
       originalCtx.drawImage(img, 0, 0, 128, 128);
-      resultCtx.drawImage(img, 0, 0, 128, 128);
       imageLoaded = true;
     };
     img.src = event.target.result;
